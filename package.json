@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/teddyhn/3d-connect-four-api#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "shortid": "^2.2.15",
+    "socket.io": "^2.3.0"
   }
 }
