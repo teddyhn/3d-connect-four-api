@@ -58,8 +58,7 @@ io.on("connection", (socket) => {
             if (error) throw error
           
             if (clients.length === 2) {
-                socket.to(roomID).emit("validRoom")
-                socket.emit("validRoom")
+                socket.emit("validRoom", { id: roomID })
 
                 // Randomly assign a player to have first turn
 
@@ -85,8 +84,6 @@ io.on("connection", (socket) => {
             socket.to(roomID).emit("gameWon", data.color)
             socket.emit("gameWon", data.color)
         }
-
-        console.log(rooms[roomID].grid)
 
         socket.to(roomID).emit("playerTurn", data)
         socket.emit("playerTurn", data)
