@@ -7,8 +7,6 @@ const checkWin = require("./utils/checkWin")
 
 const port = process.env.PORT || 4001
 const index = require("./routes/index")
-const e = require("express")
-const { updateGrid } = require("./utils/grid")
 
 const app = express()
 app.use(index)
@@ -19,16 +17,21 @@ const io = socketIo(server)
 
 let rooms = {}
 
+// Keeps track of which sockets (clients) are connected to what rooms
+let connections = {}
+
 io.on("connection", (socket) => {
     console.log(`Connected: ${socket.id}`)
 
     socket.on("disconnect", () => {
         console.log(`Disconnected: ${socket.id}`)
+        socket.to(connections[socket.id]).emit("roomAbandoned")
     })
 
     socket.on("createRoom", () => {
         const roomID = shortid.generate().substring(0, 5)
         socket.join(roomID)
+        connections[socket.id] = roomID
 
         rooms[roomID] = { players: [socket] }
 
@@ -41,9 +44,9 @@ io.on("connection", (socket) => {
           
             if (clients.length === 1) {
                 socket.join(roomID)
-                rooms[roomID].players.push(socket)
+                connections[socket.id] = roomID
 
-                console.log(rooms[roomID].players)
+                rooms[roomID].players.push(socket)
 
                 socket.to(roomID).emit("startGame")
             }
@@ -59,6 +62,11 @@ io.on("connection", (socket) => {
           
             if (clients.length === 2) {
                 socket.emit("validRoom", { id: roomID })
+                
+                // Assign blue to host player
+                socket.to(roomID).emit("assignColor", { color: "blue" })
+                // Assign red to invited player
+                socket.emit("assignColor", { color: "red" })
 
                 // Randomly assign a player to have first turn
 
@@ -67,8 +75,6 @@ io.on("connection", (socket) => {
                 rooms[roomID].players[randInt].emit("yourTurn")
                 rooms[roomID].turn = randInt
                 rooms[roomID].grid = grid.updateGrid()
-
-                console.log(rooms[roomID])
             }
 
             else socket.emit("invalidRoom")
@@ -91,6 +97,11 @@ io.on("connection", (socket) => {
         rooms[roomID].turn === 0 ? rooms[roomID].turn = 1 : rooms[roomID].turn = 0
 
         rooms[roomID].players[rooms[roomID].turn].emit("yourTurn")
+    })
+
+    socket.on("leaveRoom", (roomID) => {
+        console.log(`Socket: ${socket.id} left room ${roomID}`)
+        socket.leave(roomID)
     })
 })
 
