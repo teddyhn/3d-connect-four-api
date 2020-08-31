@@ -89,6 +89,8 @@ io.on("connection", (socket) => {
         if (checkWin.checkWin(rooms[roomID].grid, data.color)) {
             socket.to(roomID).emit("gameWon", data.color)
             socket.emit("gameWon", data.color)
+
+            return
         }
 
         socket.to(roomID).emit("playerTurn", data)
@@ -102,6 +104,29 @@ io.on("connection", (socket) => {
     socket.on("leaveRoom", (roomID) => {
         console.log(`Socket: ${socket.id} left room ${roomID}`)
         socket.leave(roomID)
+        socket.to(connections[socket.id]).emit("roomAbandoned")
+    })
+
+    socket.on("rematch", (roomID) => {
+        socket.to(roomID).emit("rematchRequested")
+    })
+
+    socket.on("acceptRematch", (roomID) => {
+        console.log("Rematch accepted")
+        socket.to(roomID).emit("rematchAccepted")
+        socket.emit("rematchAccepted")
+        
+        // Reset grid
+        rooms[roomID].grid = grid.updateGrid()
+
+        // Previous loser gets first turn
+        rooms[roomID].turn === 0 ? rooms[roomID].turn = 1 : rooms[roomID].turn = 0
+        rooms[roomID].players[rooms[roomID].turn].emit("yourTurn")
+    })
+
+    socket.on("declineRematch", (roomID) => {
+        console.log("Rematch declined")
+        socket.to(roomID).emit("rematchDeclined")
     })
 })
 
