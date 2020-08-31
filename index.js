@@ -85,6 +85,9 @@ io.on("connection", (socket) => {
         console.log("Player turn,", "Room ID:", roomID, data)
 
         rooms[roomID].grid = grid.updateGrid(rooms[roomID].grid, data)
+        
+        socket.to(roomID).emit("playerTurn", data)
+        socket.emit("playerTurn", data)
 
         if (checkWin.checkWin(rooms[roomID].grid, data.color)) {
             socket.to(roomID).emit("gameWon", data.color)
@@ -92,9 +95,6 @@ io.on("connection", (socket) => {
 
             return
         }
-
-        socket.to(roomID).emit("playerTurn", data)
-        socket.emit("playerTurn", data)
 
         rooms[roomID].turn === 0 ? rooms[roomID].turn = 1 : rooms[roomID].turn = 0
 
