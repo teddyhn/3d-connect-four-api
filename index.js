@@ -116,12 +116,14 @@ io.on("connection", (socket) => {
         socket.to(roomID).emit("rematchAccepted")
         socket.emit("rematchAccepted")
         
-        // Reset grid
-        rooms[roomID].grid = grid.updateGrid()
+        setTimeout(() => {
+            // Reset grid
+            rooms[roomID].grid = grid.updateGrid()
 
-        // Previous loser gets first turn
-        rooms[roomID].turn === 0 ? rooms[roomID].turn = 1 : rooms[roomID].turn = 0
-        rooms[roomID].players[rooms[roomID].turn].emit("yourTurn")
+            // Previous loser gets first turn
+            rooms[roomID].turn === 0 ? rooms[roomID].turn = 1 : rooms[roomID].turn = 0
+            rooms[roomID].players[rooms[roomID].turn].emit("yourTurn")
+        }, 2000)
     })
 
     socket.on("declineRematch", (roomID) => {
