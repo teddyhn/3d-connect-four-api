@@ -1,0 +1,26 @@
+{
+  "name": "3d-connect-four-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teddyhn/3d-connect-four-api.git"
+  },
+  "author": "Theodore Ngo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/teddyhn/3d-connect-four-api/issues"
+  },
+  "homepage": "https://github.com/teddyhn/3d-connect-four-api#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "shortid": "^2.2.15",
+    "socket.io": "^2.3.0"
+  }
+}
